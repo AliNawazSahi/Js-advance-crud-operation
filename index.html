@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ali&Ahsan Project</title>
+    <style>
+        * {
+            padding: 0px;
+            margin: 0px;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #564a5536;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        #input_container {
+            margin: 40px 40px 0px 40px;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .input_tags {
+            padding: 3px 10px;
+            border-radius: 5px;
+        }
+
+        #date_div {
+            margin-right: 80px;
+        }
+
+        #date_2_div {
+            display: flex;
+            flex-direction: row;
+        }
+
+        #fullNameValidationError {
+            color: red;
+            margin-top: 5px;
+            margin-left: 7px;
+        }
+
+        #category_div {
+            margin-right: 128px;
+        }
+
+        #input_container2 {
+            margin-left: 40px;
+            display: flex;
+            flex-direction: row;
+        }
+
+        #add_button {
+            height: 45px;
+            width: 64px;
+            margin-top: 15px;
+            color: rgb(123, 253, 112);
+            background-color: black;
+            border-radius: 7px;
+            margin-left: 90px;
+            margin-bottom: 20px;
+        }
+
+        #add_button:hover {
+            height: 45px;
+            width: 64px;
+            margin-top: 15px;
+            color: rgb(5, 5, 5);
+            background-color: rgb(247, 241, 241);
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        #search_div {
+            display: flex;
+            flex-direction: row;
+            height: 29px;
+            margin-left: 40px;
+            margin-top: 20px;
+            margin-bottom: 40px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        #search_div h1 {
+            padding-right: 50px;
+        }
+
+        #sea {
+            margin-left: 236px;
+        }
+
+        #output_container {
+            margin-left: 40px;
+        }
+
+        #output_container th {
+            width: 160px;
+        }
+
+        .del_btn {
+            padding: 0px 57px;
+            background-color: red;
+        }
+
+        .edit_btn {
+            padding: 0px 65px;
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <form method="POST" name="sample" autocomplete="off">
+        <div id="input_container">
+            <div id="date_div">
+                <div id="date_2_div">
+                    <h2>DATE <span style="color: red;">*</span></h2>
+                    <label class="validation-error hide" id="fullNameValidationError" hidden>This field is
+                        required.</label>
+                </div>
+                <input id="dat" type="date" name="dat" class="input_tags">
+
+            </div>
+            <div id="category_div">
+                <h2> CATEGORY </h2>
+                <select name="cat" id="cat" class="input_tags">
+                    <option value=""></option>
+                    <option value="Food & Beverages">Food & Beverages</option>
+                    <option value="Transportation">Transportation</option>
+                    <option value="Rentals">Rentals</option>
+                    <option value="Electric Bills">Electric Bills</option>
+                </select>
+
+            </div>
+            <div id="description_div">
+                <h2> DESCRIPTION </h2>
+                <input type="text" id="des" name="des" class="input_tags">
+            </div>
+        </div>
+        <br><br>
+        <div id="input_container2">
+            <div id="expense_div">
+                <h2> EXPENSE </h2>
+                <input type="number" id="exp" name="exp" class="input_tags ">
+            </div>
+            <input type="button" name="add" value="Add" onclick="operator();" id="add_button">
+
+        </div>
+
+
+        <hr>
+
+        <div id="search_div">
+            <h1>Monthly Expenses</h1>
+            <input type="search" placeholder="search by category..." class="input_tags" id="sea" onkeyup="search_fun()">
+            <select name="dropdown" id="dropdown" style="margin-left: 20px; border-radius: 5px;">
+                <!-- <option value="Arrange by Default">Arrange by Default</option> -->
+                <option value="Date">Date</option>
+                <option value="Category">Category</option>
+                <option value="Description">Description</option>
+                <option value="Expense">Expense</option>
+            </select>
+            <input type="button" name="asc_button" id="asc_button" value="ASC" onclick="sortAscending()"
+                style="margin: 0px 4px; border-radius: 4px; background-color: rgb(250, 12, 12); color: white;">
+            <input type="button" name="dsc_button" id="dsc_button" value="DSC" onclick="sortDescending()"
+                style="margin: 0px 4px; border-radius: 4px; background-color: blue; color: white;">
+        </div>
+        <div id="output_container">
+            <table id="tbl" class="table" border="1">
+                <thead>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Description </th>
+                    <th>Expense</th>
+                    <th>Delete</th>
+                    <th>EDIT</th>
+
+                </thead>
+
+                <tbody>
+
+
+                </tbody>
+            </table>
+
+        </div>
+    </form>
+
+
+    <script type="text/javascript">
+
+        dat.max = new Date().toISOString().split("T")[0]
+
+        var selectedRow = null
+
+        function operator() {
+            if (validate()) {
+
+            }
+
+            else if (selectedRow == null) {
+                addrow();
+                dat.value = "";
+                cat.value = "";
+                des.value = "";
+                exp.value = "";
+            }
+            else {
+                addUpStud()
+                resetForm()
+            }
+
+        }
+
+        function addrow() {
+
+            var dat = document.sample.dat.value;
+            var cat = document.sample.cat.value;
+            var des = document.sample.des.value;
+            var exp = document.sample.exp.value;
+
+            var tr = document.createElement('tr');
+
+            var td1 = tr.appendChild(document.createElement('td'));
+            var td2 = tr.appendChild(document.createElement('td'));
+            var td5 = tr.appendChild(document.createElement('td'));
+            var td6 = tr.appendChild(document.createElement('td'));
+            var td3 = tr.appendChild(document.createElement('td'));
+            var td4 = tr.appendChild(document.createElement('td'));
+
+            td1.innerHTML = dat;
+            td2.innerHTML = cat;
+            td5.innerHTML = des;
+            td6.innerHTML = exp;
+            td3.innerHTML = '<input type="button" name="del" value="Delete" onclick="delStudent(this);" class="del_btn">'
+            td4.innerHTML = '<input type="button" name="up" value="Edit" onclick="UpStud(this);" class="edit_btn">'
+
+            document.getElementById("tbl").appendChild(tr);
+
+            dat.value = "";
+            cat.value = "";
+            des.value = "";
+            exp.value = "";
+
+            selectedRow = null
+
+        }
+
+        function resetForm() {
+            document.getElementById("dat").value = "";
+            document.getElementById("cat").value = "";
+            document.getElementById("des").value = "";
+            document.getElementById("exp").value = "";
+            selectedRow = null;
+        }
+
+        function UpStud(stud) {
+
+            selectedRow = stud.parentElement.parentElement;
+            document.getElementById("dat").value = selectedRow.cells[0].innerHTML;
+            document.getElementById("cat").value = selectedRow.cells[1].innerHTML;
+            document.getElementById("des").value = selectedRow.cells[2].innerHTML;
+            document.getElementById("exp").value = selectedRow.cells[3].innerHTML;
+            document.getElementById("add_button").value = `Update`
+
+        }
+
+        function addUpStud() {
+            selectedRow.cells[0].innerHTML = dat.value;
+            selectedRow.cells[1].innerHTML = cat.value;
+            selectedRow.cells[2].innerHTML = des.value;
+            selectedRow.cells[3].innerHTML = exp.value;
+            document.getElementById("add_button").value = `Add`
+        }
+
+
+        function delStudent(Stud) {
+            if (confirm("Do you really want to delete this data ?")) {
+                var s = Stud.parentNode.parentNode;
+                s.parentNode.removeChild(s);
+            }
+        }
+
+        des.addEventListener("input", function () {
+            let words = this.value.split('');
+            if (words.length > 50) {
+                alert('You are not Allowed to exceed length of 50 words')
+                this.value = this.value.substring(0, this.value.lastIndexOf("", 50))
+            }
+        })
+
+
+        function validate() {
+            isValid = true;
+            if (document.getElementById("dat").value == "") {
+                isValid = true;
+                document.getElementById("fullNameValidationError").classList.remove("hide");
+
+                let appear = document.getElementById("fullNameValidationError");
+                appear.removeAttribute('hidden');
+
+            } else {
+                isValid = false;
+                if (!document.getElementById("fullNameValidationError").classList.contains("hide"))
+                    document.getElementById("fullNameValidationError").classList.add("hide");
+                let appear = document.getElementById("fullNameValidationError");
+                appear.setAttribute('hidden', false);
+            }
+            return isValid;
+        }
+
+
+        // For Search Filter 
+
+
+        let search_fun = () => {
+            let filter = document.getElementById("sea").value.toUpperCase();
+            let myTable = document.getElementById("tbl");
+            let tr = myTable.getElementsByTagName("tr");
+            for (var i = 0; i < tr.length; i++) {
+                let td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    let textvalue = td.textContent || td.innerHTML;
+                    if (textvalue.toLocaleUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+
+        //   Arranging the table data 
+
+
+
+        function sortAscending() {
+            var table, rows, switching, i, x, y, shouldSwitch;
+            table = document.getElementById("tbl");
+            switching = true;
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("td")[document.getElementById("dropdown").selectedIndex].innerHTML;
+                    y = rows[i + 1].getElementsByTagName("td")[document.getElementById("dropdown").selectedIndex].innerHTML;
+                    if (x.toLowerCase() > y.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                }
+            }
+        }
+
+        function sortDescending() {
+            var table, rows, switching, i, x, y, shouldSwitch;
+            table = document.getElementById("tbl");
+            switching = true;
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("td")[document.getElementById("dropdown").selectedIndex].innerHTML;
+                    y = rows[i + 1].getElementsByTagName("td")[document.getElementById("dropdown").selectedIndex].innerHTML;
+                    if (x.toLowerCase() < y.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                }
+            }
+        }
+
+
+
+    </script>
+
+</body>
+
+</html>
